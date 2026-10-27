@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -19,6 +20,7 @@ internal sealed class BubbleWindow : Window
     private readonly Canvas root=new();
     private readonly OrbVisual orb=new();
     private readonly Border capsule;
+    private readonly ContextMenu menu;
     private readonly StackPanel commands=new(){Orientation=Orientation.Horizontal,Width=198,Height=68};
     private readonly DispatcherTimer idle=new(){Interval=TimeSpan.FromMilliseconds(100)};
     private readonly DispatcherTimer motion=new(){Interval=TimeSpan.FromMilliseconds(16)};
@@ -43,6 +45,10 @@ internal sealed class BubbleWindow : Window
     internal int CommandCount=>commands.Children.Count;
     internal DockEdge DockedEdge=>home.Edge;
     internal Point OrbScreenCenter=>orb.PointToScreen(new Point(36,36));
+    internal ContextMenu MenuForAudit=>menu;
+    internal FrameworkElement CommandsForAudit=>commands;
+    internal FrameworkElement[] DecorationsForAudit=>new FrameworkElement[]{capsule,orb};
+    internal void ShowMenuForAudit()=>ShowContextMenu();
     internal void SetExpandedForAudit(bool value,bool animate=false)=>SetExpanded(value,animate);
     internal void RevealForAudit()=>Reveal(false);
     internal void DockAndHideForAudit(DockEdge edge)
@@ -57,6 +63,10 @@ internal sealed class BubbleWindow : Window
     {
         this.controller=controller;Title="Luma · 玻璃胶囊";Width=BubbleGeometry.ExpandedWidth;Height=92;ResizeMode=ResizeMode.NoResize;ShowInTaskbar=false;ShowActivated=false;Topmost=true;WindowStartupLocation=WindowStartupLocation.Manual;
         Native.TransparentOverlay(this);Cursor=Cursors.Hand;
+        menu=new ContextMenu{Style=(Style)FindResource("BubbleMenu"),ItemContainerStyle=(Style)FindResource("BubbleMenuItem"),PlacementTarget=root,Placement=PlacementMode.Bottom,VerticalOffset=8};
+        AddMenu("打开应用","\uE80F",()=>controller.ShowMain());AddMenu("偏好设置","\uE713",()=>controller.ShowMain("settings"));AddMenu("退出应用","\uE8BB",controller.Quit);
+        menu.Opened+=(_,_)=>controller.BubbleExpansionChanged(true);
+        menu.Closed+=(_,_)=>{lastInteraction=DateTime.UtcNow;controller.BubbleExpansionChanged(expanded);};
         capsule=new Border{Height=72,Width=72,CornerRadius=new CornerRadius(36),Opacity=0,Background=new LinearGradientBrush(new GradientStopCollection{new((Color)ColorConverter.ConvertFromString("#ECFFFFFF"),0),new((Color)ColorConverter.ConvertFromString("#D6EAF2FF"),.55),new((Color)ColorConverter.ConvertFromString("#BBC9DCFA"),1)},80),BorderThickness=new Thickness(1),BorderBrush=new LinearGradientBrush(Colors.White,(Color)ColorConverter.ConvertFromString("#8FB1C8ED"),90),Effect=new DropShadowEffect{BlurRadius=14,ShadowDepth=4,Opacity=.15,Color=Color.FromRgb(58,77,114)}};
         root.Children.Add(capsule);commands.Opacity=0;commands.Visibility=Visibility.Hidden;commands.IsHitTestVisible=false;
         AddCommand("查词","\uE721","打开查词面板",()=>controller.ShowMain("home"));
@@ -70,16 +80,26 @@ internal sealed class BubbleWindow : Window
         Loaded+=(_,_)=>{var bounds=HostBounds();anchorX=bounds.Left;anchorY=bounds.Top;initialized=true;RefreshArea();Snap(false,false);RefreshState();idle.Start();};
         DpiChanged+=(_,_)=>Dispatcher.BeginInvoke(()=>{if(initialized&&!pressed){CollapseImmediate();RefreshArea();Snap(false,false);}});
         orb.MouseLeftButtonDown+=OnPress;MouseMove+=OnMove;MouseLeftButtonUp+=OnRelease;
-        orb.MouseRightButtonUp+=(_,e)=>{ToggleMenu();e.Handled=true;};
+        PreviewMouseRightButtonUp+=(_,e)=>{ShowContextMenu();e.Handled=true;};
         MouseEnter+=(_,_)=>{lastInteraction=DateTime.UtcNow;if(hidden)Reveal(true);};
         idle.Tick+=(_,_)=>Idle();motion.Tick+=(_,_)=>AnimateFrame();
         IsVisibleChanged+=(_,_)=>{if(!IsVisible&&initialized){CollapseImmediate();idle.Stop();}else if(IsVisible&&initialized){lastInteraction=DateTime.UtcNow;idle.Start();}};
-        Closed+=(_,_)=>{closed=true;idle.Stop();motion.Stop();completed=null;controller.BubbleExpansionChanged(false);};
+        Closed+=(_,_)=>{closed=true;menu.IsOpen=false;idle.Stop();motion.Stop();completed=null;controller.BubbleExpansionChanged(false);};
+    }
+    private void AddMenu(string title,string glyph,Action action)
+    {
+        var content=new StackPanel{HorizontalAlignment=HorizontalAlignment.Center};var icon=Theme.I(glyph,17,Theme.Accent);icon.HorizontalAlignment=HorizontalAlignment.Center;content.Children.Add(icon);var label=Theme.T(title,12,Theme.Ink,true);label.HorizontalAlignment=HorizontalAlignment.Center;label.Margin=new Thickness(0,4,0,0);content.Children.Add(label);
+        var item=new MenuItem{Header=content};AutomationProperties.SetName(item,title);item.Click+=(_,_)=>{menu.IsOpen=false;action();};menu.Items.Add(item);
+    }
+    private void ShowContextMenu()
+    {
+        if(menu.IsOpen){menu.IsOpen=false;return;}if(hidden)Reveal(false);lastInteraction=DateTime.UtcNow;
+        menu.PlacementRectangle=new Rect(SurfaceOffset+10,10,Math.Max(72,visualWidth-20),72);menu.IsOpen=true;
     }
     private void AddCommand(string label,string glyph,string tooltip,Action action)
     {
         var content=new StackPanel{HorizontalAlignment=HorizontalAlignment.Center};var icon=Theme.I(glyph,19,Theme.Accent);icon.HorizontalAlignment=HorizontalAlignment.Center;content.Children.Add(icon);var text=Theme.T(label,12,Theme.Ink,true);text.Margin=new Thickness(0,5,0,0);text.HorizontalAlignment=HorizontalAlignment.Center;content.Children.Add(text);
-        var button=Theme.Button(label,()=>Perform(action));button.Content=content;button.Width=60;button.Height=60;button.Padding=new Thickness(3);button.Margin=new Thickness(3,0,3,0);button.Background=Brushes.Transparent;button.BorderBrush=Brushes.Transparent;button.ToolTip=tooltip;commands.Children.Add(button);
+        var button=Theme.Button(label,()=>Perform(action));button.Style=(Style)FindResource("CapsuleCommand");button.Content=content;button.Width=60;button.Height=56;button.Padding=new Thickness(3);button.Margin=new Thickness(3,0,3,0);button.Background=Brushes.Transparent;button.BorderBrush=Brushes.Transparent;button.ToolTip=tooltip;commands.Children.Add(button);
     }
     private void Perform(Action action){if(!animating)SetExpanded(false,true,action);}
     private void OnPress(object sender,MouseButtonEventArgs e)
@@ -101,7 +121,7 @@ internal sealed class BubbleWindow : Window
     }
     public void RefreshState(){orb.Refresh(controller.Store.Settings.Enabled);if(initialized&&!controller.Store.Settings.BubbleAutoHide&&hidden)Reveal(true);}
     public void ToggleMenu(){if(hidden)Reveal(false);SetExpanded(!expanded,true);}
-    public void CloseMenu(){if(expanded)SetExpanded(false,true);}
+    public void CloseMenu(){menu.IsOpen=false;if(expanded)SetExpanded(false,true);}
     private void SetExpanded(bool value,bool animate,Action? after=null)
     {
         if(!initialized||closed){after?.Invoke();return;}
@@ -113,7 +133,7 @@ internal sealed class BubbleWindow : Window
     private void ConfigureDirection(){opensRight=BubbleGeometry.Expand(home,area,scale).OpensRight;ApplySurface();}
     private void CollapseImmediate()
     {
-        if(!initialized)return;motion.Stop();animating=false;completed=null;expanded=false;hidden=false;visualWidth=92;capsule.Opacity=0;commands.Opacity=0;commands.Visibility=Visibility.Hidden;commands.IsHitTestVisible=false;controller.BubbleExpansionChanged(false);Move(home.X,home.Y);
+        if(!initialized)return;menu.IsOpen=false;motion.Stop();animating=false;completed=null;expanded=false;hidden=false;visualWidth=92;capsule.Opacity=0;commands.Opacity=0;commands.Visibility=Visibility.Hidden;commands.IsHitTestVisible=false;controller.BubbleExpansionChanged(false);Move(home.X,home.Y);
     }
     private void RefreshArea(){scale=VisualTreeHelper.GetDpi(this).DpiScaleX;var screen=System.Windows.Forms.Screen.FromRectangle(OrbBounds());area=screen.WorkingArea;screenBounds=screen.Bounds;}
     private void Snap(bool animate,bool save)
@@ -123,7 +143,7 @@ internal sealed class BubbleWindow : Window
     private void SavePosition(){controller.Store.Settings.BubbleX=Left+OrbOffset;controller.Store.Settings.BubbleY=Top;controller.Store.Settings.BubblePositionSaved=true;controller.Store.SaveSettings();}
     private void Idle()
     {
-        if(!initialized||closed||!IsVisible||pressed||animating)return;
+        if(!initialized||closed||!IsVisible||pressed||animating||menu.IsOpen)return;
         Native.GetCursorPos(out var point);var bounds=VisualBounds();bounds.Inflate(3,3);var inside=bounds.Contains(point.X,point.Y)&&screenBounds.Contains(point.X,point.Y);
         if(hidden){if(inside)Reveal(true);return;}if(inside){lastInteraction=DateTime.UtcNow;return;}
         var elapsed=(DateTime.UtcNow-lastInteraction).TotalMilliseconds;
@@ -150,6 +170,7 @@ internal sealed class BubbleWindow : Window
     {
         capsule.Width=Math.Max(72,visualWidth-20);Canvas.SetLeft(capsule,SurfaceOffset+10);Canvas.SetTop(capsule,10);
         Canvas.SetLeft(commands,opensRight?96:12);Canvas.SetTop(commands,12);Canvas.SetLeft(orb,OrbOffset+10);Canvas.SetTop(orb,10);
+        commands.Clip=new RectangleGeometry(new Rect(SurfaceOffset+10-(opensRight?96:12),-2,Math.Max(72,visualWidth-20),72),36,36);
         var clip=new Rect(SurfaceOffset,0,visualWidth,92);
         if(initialized){var hostX=anchorX-OrbOffset*scale;clip.Intersect(new Rect((screenBounds.Left-hostX)/scale,(screenBounds.Top-anchorY)/scale,screenBounds.Width/scale,screenBounds.Height/scale));}
         root.Clip=new RectangleGeometry(clip);

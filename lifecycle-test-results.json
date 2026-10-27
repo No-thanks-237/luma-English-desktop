@@ -1,0 +1,36 @@
+{
+  "passed": 6,
+  "failed": 0,
+  "tests": [
+    {
+      "name": "Close to tray keeps process and hides main window",
+      "passed": true,
+      "mode": "close"
+    },
+    {
+      "name": "Background application can reopen",
+      "passed": true,
+      "mode": "close"
+    },
+    {
+      "name": "Close with exit preference shuts down process",
+      "passed": true,
+      "mode": "close"
+    },
+    {
+      "name": "Close to tray keeps process and hides main window",
+      "passed": true,
+      "mode": "button"
+    },
+    {
+      "name": "Background application can reopen",
+      "passed": true,
+      "mode": "button"
+    },
+    {
+      "name": "Explicit exit ignores background preference",
+      "passed": true,
+      "mode": "button"
+    }
+  ]
+}

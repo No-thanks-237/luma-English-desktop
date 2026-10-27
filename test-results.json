@@ -1,8 +1,13 @@
 {
-  "at": "2026-10-27T21:44:38.3419425+08:00",
-  "passed": 17,
+  "at": "2026-10-27T22:32:30.9813221+08:00",
+  "passed": 23,
   "failed": 0,
   "tests": [
+    {
+      "name": "Close behavior defaults and persistence",
+      "passed": true,
+      "detail": "OK"
+    },
     {
       "name": "Dock geometry / four edges / high DPI",
       "passed": true,
@@ -85,6 +90,31 @@
     },
     {
       "name": "OpenAI-compatible request / translation / JSON explanation / error",
+      "passed": true,
+      "detail": "OK"
+    },
+    {
+      "name": "Updates: version comparison, prereleases and no downgrade",
+      "passed": true,
+      "detail": "OK"
+    },
+    {
+      "name": "Updates: trusted repository and checksum metadata required",
+      "passed": true,
+      "detail": "OK"
+    },
+    {
+      "name": "Updates: verified download and cached installer",
+      "passed": true,
+      "detail": "OK"
+    },
+    {
+      "name": "Updates: corrupt download rejected and partial file removed",
+      "passed": true,
+      "detail": "OK"
+    },
+    {
+      "name": "Updates: incomplete and cancelled download blocked",
       "passed": true,
       "detail": "OK"
     }

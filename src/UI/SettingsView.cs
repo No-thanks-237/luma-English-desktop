@@ -37,6 +37,9 @@ internal sealed class SettingsView : UserControl
             var button = Theme.Button(item.Item2, () => Select(item.Item1)); button.Padding = new Thickness(12, 8, 12, 8); button.Margin = new Thickness(0, 0, 7, 7); button.BorderThickness = new Thickness(0); tabs[item.Item1] = button; tabBar.Children.Add(button);
         }
         var general = new StackPanel();
+        var closeBehavior=new ComboBox{ItemsSource=new[]{"在后台继续运行（系统托盘）","完全退出应用"},SelectedIndex=draft.CloseToTray?0:1};
+        closeBehavior.SelectionChanged+=(_,_)=>draft.CloseToTray=closeBehavior.SelectedIndex==0;
+        Field(general,"关闭主窗口时",closeBehavior,"仅影响右上角关闭按钮与 Alt+F4；「退出应用」始终完全退出。");
         trigger = new ComboBox { ItemsSource = new[] { "按住 Alt + 鼠标停留", "鼠标停留自动查词", "仅使用查词快捷键" }, SelectedIndex = draft.Trigger == "Alt" ? 0 : draft.Trigger == "Hover" ? 1 : 2 };
         Field(general, "取词方式", trigger, "默认按住 Alt 取词，减少阅读时的误触。");
         var delay = Theme.T(draft.DwellMs + " ms", 12, Theme.Accent, true); dwell = new Slider { Minimum = 200, Maximum = 1200, TickFrequency = 50, IsSnapToTickEnabled = true, Value = draft.DwellMs, Margin = new Thickness(0, 8, 17, 0) }; dwell.ValueChanged += (_, _) => delay.Text = ((int)dwell.Value) + " ms";
@@ -58,7 +61,7 @@ internal sealed class SettingsView : UserControl
         provider.SelectionChanged += (_, _) => { if (provider.SelectedIndex == 0) { url.Text = "https://api.deepseek.com"; model.Text = "deepseek-flash"; } }; pages["api"] = Theme.Scroll(api);
         var keys = new StackPanel(); keys.Children.Add(Info("把常用动作留给快捷键。", "使用 Ctrl、Alt、Shift、Win 与一个主键组合。保存时检查冲突，失败后保留原配置。")); Theme.Space(keys, 22);
         captureKey = new TextBox { Text = draft.CaptureHotkey }; lookupKey = new TextBox { Text = draft.LookupHotkey }; pauseKey = new TextBox { Text = draft.PauseHotkey }; Field(keys, "框选翻译", captureKey); Field(keys, "立即查询鼠标处单词", lookupKey); Field(keys, "暂停 / 恢复取词", pauseKey); pages["keys"] = Theme.Scroll(keys);
-        var about = new StackPanel(); about.Children.Add(Info("Luma 拾词 0.1.4", "让阅读自然继续。为桌面英语学习做一个轻巧、安静的小助手。")); Theme.Space(about, 18);
+        var about = new StackPanel(); about.Children.Add(Info("Luma 拾词 0.1.5", "让阅读自然继续。为桌面英语学习做一个轻巧、安静的小助手。")); Theme.Space(about, 18);about.Children.Add(new UpdateView(controller,owner));Theme.Space(about,18);
         about.Children.Add(Theme.T("770,611 个离线词条\n" + controller.Dictionary.Roots.RootCount + " 条词根记录 · 关联 " + controller.Dictionary.Roots.CoveredWords.ToString("N0") + " 个单词\n维基词典词源：查询后缓存，可离线复用", 13)); about.Children.Add(Theme.Rule()); about.Children.Add(Theme.T("词典与词根：ECDICT · MIT\n在线词源：Wiktionary · CC BY-SA 4.0\n图片识别：Tesseract · Apache 2.0", 12, Theme.Muted)); Theme.Space(about, 18);
         var data = Theme.Button("打开本地数据文件夹", () => System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(controller.Store.Root) { UseShellExecute = true }), false, "\uE8B7"); data.HorizontalAlignment = HorizontalAlignment.Left; about.Children.Add(data); Theme.Space(about, 15); about.Children.Add(Theme.T("支持英文取词与英文屏幕识别。Google / Bing 翻译接口尚未接入。", 11, Theme.Muted)); pages["about"] = Theme.Scroll(about);
         var actions = new StackPanel { Orientation = Orientation.Horizontal }; test = Theme.Button("测试连接", () => _ = TestConnection()); test.Margin = new Thickness(0, 0, 9, 0); actions.Children.Add(test); actions.Children.Add(Theme.Button("保存设置", () => Save(), true, "\uE73E"));

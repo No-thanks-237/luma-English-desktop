@@ -33,8 +33,11 @@ internal sealed class App : Application
             try
             {
                 app.controller = new Controller(args.Contains("--quiet"), requestedDataRoot);
+                if(args.Contains("--update-failed"))app.controller.UpdateFailed();
                 var auditFolder = args.SkipWhile(x => x != "--ui-audit").Skip(1).FirstOrDefault();
                 if (preview && auditFolder != null) app.Dispatcher.BeginInvoke(async () => { try { await UiAudit.Run(app.controller, (MainWindow)app.MainWindow, auditFolder); } catch (Exception ex) { Directory.CreateDirectory(auditFolder); File.WriteAllText(Path.Combine(auditFolder, "ui-audit-error.txt"), ex.ToString()); } });
+                var lifecycleFolder=args.SkipWhile(x=>x!="--lifecycle-audit").Skip(1).FirstOrDefault();
+                if(preview&&lifecycleFolder!=null)app.Dispatcher.BeginInvoke(async()=>await LifecycleAudit.Run(app.controller,(MainWindow)app.MainWindow,lifecycleFolder,args.Contains("--explicit-exit")));
                 app.reopen = new EventWaitHandle(false, EventResetMode.AutoReset, reopenName);
                 app.registered = ThreadPool.RegisterWaitForSingleObject(app.reopen, (_, _) => app.Dispatcher.BeginInvoke(() => app.controller.ShowMain()), null, Timeout.Infinite, false);
             }

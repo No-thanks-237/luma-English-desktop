@@ -63,6 +63,7 @@ internal sealed class Controller : IDisposable
         if (target != null) main.Navigate(target);
         main.Show(); if (main.WindowState == WindowState.Minimized) main.WindowState = WindowState.Normal; main.Activate();
     }
+    public void UpdateFailed(){ShowMain("settings");main.SetNotice("更新未完成，已重新打开应用。请在设置中重试，或从 GitHub Releases 下载新版安装包。");}
     public void ToggleEnabled()
     {
         Store.Settings.Enabled = !Store.Settings.Enabled; Store.SaveSettings(); main.UpdateStatus();

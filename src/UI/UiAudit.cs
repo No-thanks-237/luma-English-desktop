@@ -23,6 +23,7 @@ internal static class UiAudit
         Check("title blank area is native caption",()=>{if(Native.HitTest(main,new Point(400,28))!=2)throw new Exception("Blank title cannot drag");});
         Check("title brand is native caption",()=>{if(Native.HitTest(main,new Point(55,28))!=2)throw new Exception("Brand cannot drag");});
         Check("title buttons remain client controls",()=>{if(Native.HitTest(main,new Point(main.ActualWidth-42,28))!=1)throw new Exception("Title button intercepted by caption");});
+        Check("main exposes explicit exit action",()=>{if(!Children(main).OfType<Button>().Any(b=>System.Windows.Automation.AutomationProperties.GetName(b)=="退出应用"))throw new Exception("Missing exit button");});
         main.WindowState=WindowState.Maximized;await main.Dispatcher.InvokeAsync(()=>{},DispatcherPriority.ApplicationIdle);main.UpdateLayout();
         Check("maximized title supports native restore drag",()=>{if(Native.HitTest(main,new Point(400,28))!=2)throw new Exception("Maximized caption cannot drag");});
         Check("maximized title buttons remain clickable",()=>{if(Native.HitTest(main,new Point(main.ActualWidth-42,28))!=1)throw new Exception("Maximized title button intercepted");});
@@ -42,6 +43,8 @@ internal static class UiAudit
                     {
                         settings.SelectTabForAudit(tab); await main.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle); main.UpdateLayout(); Check(name + "-" + tab, () => CheckButtons(main)); Check(name + "-" + tab + " input height", () => CheckInputHeights(main));
                         if (size.Width == 1120 && tab == "api") Save(main, "settings-api", folder, 1.5);
+                        if(size.Width==1120&&tab=="general"){Check("close behavior selector exposes both choices",()=>{var combo=Children(settings).OfType<ComboBox>().Single(b=>System.Windows.Automation.AutomationProperties.GetName(b)=="关闭主窗口时");if(combo.Items.Count!=2)throw new Exception("Missing close behavior choices");});Save(main,"settings-general",folder,1.5);}
+                        if(size.Width==1120&&tab=="about"){Check("settings exposes check for updates",()=>{if(!Children(settings).OfType<Button>().Any(b=>System.Windows.Automation.AutomationProperties.GetName(b)=="检查更新"))throw new Exception("Missing update action");});Save(main,"settings-about",folder,1.5);}
                     }
                 }
                 if (size.Width == 1120) Save(main, name, folder, 1.5);
@@ -52,12 +55,18 @@ internal static class UiAudit
         capsule.SetExpandedForAudit(true);await main.Dispatcher.InvokeAsync(()=>{},DispatcherPriority.ApplicationIdle);capsule.UpdateLayout();
         Check("capsule uses same native window",()=>{if(new System.Windows.Interop.WindowInteropHelper(capsule).Handle!=sphereHandle)throw new Exception("New popup created");});
         Check("capsule has three commands",()=>{if(capsule.CommandCount!=3)throw new Exception("Wrong command count");CheckButtons(capsule);});Save(capsule,"capsule-expanded",folder,1.5);
+        capsule.ShowMenuForAudit();await main.Dispatcher.InvokeAsync(()=>{},DispatcherPriority.ApplicationIdle);var context=capsule.MenuForAudit;context.UpdateLayout();
+        Check("right click menu contains requested actions",()=>{var names=context.Items.OfType<MenuItem>().Select(System.Windows.Automation.AutomationProperties.GetName).ToArray();if(!names.SequenceEqual(new[]{"打开应用","偏好设置","退出应用"}))throw new Exception("Wrong menu actions");});
+        Check("right click menu items fit the menu",()=>{foreach(var item in context.Items.OfType<MenuItem>()){var p=item.TranslatePoint(new Point(),context);if(p.X<0||p.Y<0||p.X+item.ActualWidth>context.ActualWidth+1||p.Y+item.ActualHeight>context.ActualHeight+1)throw new Exception("Menu item outside border");}});
+        SaveElement(context,"context-menu",folder,1.5);context.IsOpen=false;
+        ((MenuItem)context.Items[0]).RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));Check("context open application action",()=>{if(!main.IsVisible)throw new Exception("Application did not reopen");});
+        ((MenuItem)context.Items[1]).RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));Check("context preferences action",()=>{if(main.CurrentPage is not SettingsView)throw new Exception("Preferences did not open");});
         capsule.SetExpandedForAudit(false);capsule.UpdateLayout();Check("capsule collapses to orb",()=>{if(Math.Abs(capsule.VisualWidth-92)>1||capsule.IsExpanded)throw new Exception("Not collapsed");});
         foreach(var edge in new[]{DockEdge.Left,DockEdge.Right,DockEdge.Top,DockEdge.Bottom})
         {
             capsule.DockAndHideForAudit(edge);capsule.UpdateLayout();Check("idle hides docked orb "+edge,()=>{if(capsule.DockedEdge!=edge||!capsule.IsEdgeHidden)throw new Exception("Dock/hide failed");});
             capsule.RevealForAudit();capsule.UpdateLayout();Check("edge reveal restores orb "+edge,()=>{if(capsule.IsEdgeHidden||Math.Abs(capsule.VisualWidth-92)>1)throw new Exception("Reveal failed");});
-            capsule.SetExpandedForAudit(true);capsule.UpdateLayout();var center=capsule.OrbScreenCenter;Native.GetWindowRect(sphereHandle,out var before);string? motionError=null;Theme.MotionEnabled=true;capsule.SetExpandedForAudit(false,true);
+            capsule.SetExpandedForAudit(true);capsule.UpdateLayout();Check("button highlights stay inside rounded capsule "+edge,()=>CheckCommandClip(capsule));var center=capsule.OrbScreenCenter;Native.GetWindowRect(sphereHandle,out var before);string? motionError=null;Theme.MotionEnabled=true;capsule.SetExpandedForAudit(false,true);
             for(var frame=0;frame<18;frame++)
             {
                 await Task.Delay(16);capsule.UpdateLayout();Native.GetWindowRect(sphereHandle,out var now);var current=capsule.OrbScreenCenter;
@@ -110,7 +119,24 @@ internal static class UiAudit
         for (var i = 0; i < VisualTreeHelper.GetChildrenCount(item); i++) { var child = VisualTreeHelper.GetChild(item, i); yield return child; foreach (var descendant in Children(child)) yield return descendant; }
     }
     private static void Save(Window window, string name, string folder, double scale)
+        =>SaveElement(window,name,folder,scale);
+    private static void SaveElement(FrameworkElement window,string name,string folder,double scale)
     {
         var bitmap = new RenderTargetBitmap((int)Math.Ceiling(window.ActualWidth * scale), (int)Math.Ceiling(window.ActualHeight * scale), 96 * scale, 96 * scale, PixelFormats.Pbgra32); bitmap.Render(window); var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(bitmap)); using var file = File.Create(Path.Combine(folder, name + ".png")); encoder.Save(file);
+    }
+    private static void CheckCommandClip(BubbleWindow window)
+    {
+        var panel=window.CommandsForAudit;
+        if(panel.Clip is not RectangleGeometry shape||shape.RadiusX!=36)throw new Exception("No capsule clip");
+        var surfaces=Children(panel).OfType<Border>().Where(b=>b.Name=="Surface").ToList();
+        try
+        {
+            foreach(var surface in surfaces)surface.Background=Theme.Accent;
+            foreach(var decoration in window.DecorationsForAudit)decoration.Visibility=Visibility.Hidden;
+            window.UpdateLayout();var width=(int)Math.Ceiling(window.ActualWidth);var height=(int)Math.Ceiling(window.ActualHeight);var bitmap=new RenderTargetBitmap(width,height,96,96,PixelFormats.Pbgra32);bitmap.Render(window);var pixels=new byte[width*height*4];bitmap.CopyPixels(pixels,width*4,0);
+            var offset=panel.TranslatePoint(new Point(),window);var bounds=shape.Rect;bounds.Offset(offset.X,offset.Y);bounds.Inflate(1,1);var allowed=new RectangleGeometry(bounds,37,37);
+            for(var y=0;y<height;y++)for(var x=0;x<width;x++)if(pixels[(y*width+x)*4+3]>20&&!allowed.FillContains(new Point(x+.5,y+.5)))throw new Exception("Rendered highlight escaped capsule corner");
+        }
+        finally{foreach(var surface in surfaces)surface.ClearValue(Border.BackgroundProperty);foreach(var decoration in window.DecorationsForAudit)decoration.Visibility=Visibility.Visible;}
     }
 }

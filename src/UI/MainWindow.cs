@@ -21,6 +21,7 @@ internal sealed class MainWindow : Window
     private readonly TextBlock notice = Theme.T("", 11, Theme.Muted);
     private readonly Border noticeSurface;
     private readonly TextBlock pageLabel = Theme.T("随处查词", 13, Theme.Muted);
+    internal Button ExitButtonForAudit {get;private set;}=null!;
     private TranslationView? translations;
     private SettingsView? settings;
     private bool closing;
@@ -42,7 +43,7 @@ internal sealed class MainWindow : Window
         var separator = Theme.T("/", 14, Theme.B("#B7C0D2")); separator.Margin = new Thickness(15, 0, 15, 0); brand.Children.Add(separator); brand.Children.Add(pageLabel); top.Children.Add(brand);
         var controls = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Center };
         WindowChrome.SetIsHitTestVisibleInChrome(controls, true);
-        controls.Children.Add(Theme.IconButton("\uE921", "最小化", () => WindowState = WindowState.Minimized)); controls.Children.Add(Theme.IconButton("\uE922", "最大化 / 还原", () => WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized)); controls.Children.Add(Theme.IconButton("\uE8BB", "收起到托盘", Hide)); top.Children.Add(controls);
+        controls.Children.Add(Theme.IconButton("\uE921", "最小化", () => WindowState = WindowState.Minimized)); controls.Children.Add(Theme.IconButton("\uE922", "最大化 / 还原", () => WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized)); controls.Children.Add(Theme.IconButton("\uE8BB", "关闭窗口", Close)); top.Children.Add(controls);
         shell.Children.Add(top);
         var layout = new Grid(); layout.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(184) }); layout.ColumnDefinitions.Add(new ColumnDefinition()); Grid.SetRow(layout, 1); shell.Children.Add(layout);
         var rail = new Grid { Margin = new Thickness(15, 8, 0, 18) }; rail.RowDefinitions.Add(new RowDefinition()); rail.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
@@ -53,11 +54,11 @@ internal sealed class MainWindow : Window
         }
         AddNav("home", "随处查词", "\uE721"); AddNav("translate", "句子翻译", "\uE8C1"); AddNav("words", "我的单词本", "\uE82D"); Theme.Space(links, 20); AddNav("settings", "偏好设置", "\uE713"); rail.Children.Add(links);
         var bottom = new StackPanel { Margin = new Thickness(7, 18, 7, 8) };
-        var statusButton = Theme.Button("取词状态", () => controller.ToggleEnabled()); statusButton.Content = stateLabel; statusButton.Padding = new Thickness(10, 10, 10, 10); bottom.Children.Add(statusButton); Theme.Space(bottom, 14); bottom.Children.Add(Theme.T("LUMA  0.1.4\n一个词，一点新发现。", 10, Theme.Muted)); Grid.SetRow(bottom, 1); rail.Children.Add(bottom); layout.Children.Add(rail);
+        var statusButton = Theme.Button("取词状态", () => controller.ToggleEnabled()); statusButton.Content = stateLabel; statusButton.Padding = new Thickness(10, 10, 10, 10); bottom.Children.Add(statusButton); Theme.Space(bottom, 8);var exit=Theme.Button("退出应用",controller.Quit,false,"\uE8BB");ExitButtonForAudit=exit;exit.Padding=new Thickness(10,8,10,8);bottom.Children.Add(exit);Theme.Space(bottom,14);bottom.Children.Add(Theme.T("LUMA  0.1.5\n一个词，一点新发现。", 10, Theme.Muted)); Grid.SetRow(bottom, 1); rail.Children.Add(bottom); layout.Children.Add(rail);
         var main = new Grid { Margin = new Thickness(25, 10, 26, 22) }; main.RowDefinitions.Add(new RowDefinition()); main.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); main.Children.Add(page);
         noticeSurface = Theme.Card(notice, new Thickness(13, 9, 13, 9), Theme.B("#E7ECF2FF")); noticeSurface.Margin = new Thickness(0, 12, 0, 0); noticeSurface.Visibility = Visibility.Collapsed; Grid.SetRow(noticeSurface, 1); main.Children.Add(noticeSurface); Grid.SetColumn(main, 1); layout.Children.Add(main);
         Content = new Border { CornerRadius = new CornerRadius(24), BorderBrush = Theme.B("#F7FFFFFF"), BorderThickness = new Thickness(1), Child = shell };
-        Closing += (_, e) => { if (!closing) { e.Cancel = true; Hide(); } }; Closed += (_, _) => translations?.Cancel(); Navigate("home");
+        Closing += (_, e) => { if (!closing) { e.Cancel = true; if(controller.Store.Settings.CloseToTray)Hide();else Dispatcher.BeginInvoke(controller.Quit); } }; Closed += (_, _) => translations?.Cancel(); Navigate("home");
     }
     public void QuitClose() { closing = true; Close(); }
     public void SetNotice(string text) { notice.Text = text; noticeSurface.Visibility = string.IsNullOrWhiteSpace(text) ? Visibility.Collapsed : Visibility.Visible; }

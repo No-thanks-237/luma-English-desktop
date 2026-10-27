@@ -1,6 +1,6 @@
 {
-  "at": "2026-10-27T21:47:22.7990569+08:00",
-  "passed": 64,
+  "at": "2026-10-27T22:32:34.387511+08:00",
+  "passed": 75,
   "failed": 0,
   "tests": [
     {
@@ -13,6 +13,10 @@
     },
     {
       "name": "title buttons remain client controls",
+      "passed": true
+    },
+    {
+      "name": "main exposes explicit exit action",
       "passed": true
     },
     {
@@ -64,6 +68,10 @@
       "passed": true
     },
     {
+      "name": "close behavior selector exposes both choices",
+      "passed": true
+    },
+    {
       "name": "settings-1120-api",
       "passed": true
     },
@@ -85,6 +93,10 @@
     },
     {
       "name": "settings-1120-about input height",
+      "passed": true
+    },
+    {
+      "name": "settings exposes check for updates",
       "passed": true
     },
     {
@@ -164,6 +176,22 @@
       "passed": true
     },
     {
+      "name": "right click menu contains requested actions",
+      "passed": true
+    },
+    {
+      "name": "right click menu items fit the menu",
+      "passed": true
+    },
+    {
+      "name": "context open application action",
+      "passed": true
+    },
+    {
+      "name": "context preferences action",
+      "passed": true
+    },
+    {
       "name": "capsule collapses to orb",
       "passed": true
     },
@@ -173,6 +201,10 @@
     },
     {
       "name": "edge reveal restores orb Left",
+      "passed": true
+    },
+    {
+      "name": "button highlights stay inside rounded capsule Left",
       "passed": true
     },
     {
@@ -192,6 +224,10 @@
       "passed": true
     },
     {
+      "name": "button highlights stay inside rounded capsule Right",
+      "passed": true
+    },
+    {
       "name": "animated edge collapse keeps host and orb stationary Right",
       "passed": true
     },
@@ -208,6 +244,10 @@
       "passed": true
     },
     {
+      "name": "button highlights stay inside rounded capsule Top",
+      "passed": true
+    },
+    {
       "name": "animated edge collapse keeps host and orb stationary Top",
       "passed": true
     },
@@ -221,6 +261,10 @@
     },
     {
       "name": "edge reveal restores orb Bottom",
+      "passed": true
+    },
+    {
+      "name": "button highlights stay inside rounded capsule Bottom",
       "passed": true
     },
     {

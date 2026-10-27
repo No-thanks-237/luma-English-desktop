@@ -12,6 +12,7 @@ public sealed class Settings
     public bool BubbleAutoHide { get; set; } = true;
     public bool BubblePositionSaved { get; set; }
     public bool StartAtLogin { get; set; }
+    public bool CloseToTray { get; set; } = true;
     public bool ReduceMotion { get; set; }
     public bool ShowPhonetic { get; set; } = true;
     public bool ShowTranslation { get; set; } = true;

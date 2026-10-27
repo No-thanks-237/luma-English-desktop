@@ -1,0 +1,14 @@
+{
+  "passed": 2,
+  "failed": 0,
+  "tests": [
+    {
+      "name": "Wait for old process, verify hash and start installer with quoted path",
+      "passed": true
+    },
+    {
+      "name": "Changed installer blocked before execution",
+      "passed": true
+    }
+  ]
+}

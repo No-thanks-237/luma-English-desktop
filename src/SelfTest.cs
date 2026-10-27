@@ -53,6 +53,11 @@ internal static class SelfTest
             try { action(); results.Add(new { name, passed = true, detail = "OK" }); }
             catch (Exception ex) { failed++; results.Add(new { name, passed = false, detail = ex.ToString() }); }
         }
+        Check("Close behavior defaults and persistence",()=>{
+            var path=Path.Combine(folder,"close-behavior");var data=new Store(path);if(!data.Settings.CloseToTray)throw new Exception("New users should default to tray");
+            data.Settings.CloseToTray=false;data.SaveSettings();if(new Store(path).Settings.CloseToTray)throw new Exception("Exit preference lost");
+            File.WriteAllText(Path.Combine(path,"settings.json"),"{}");if(!new Store(path).Settings.CloseToTray)throw new Exception("Existing settings changed default");
+        });
         void Assert(bool condition, string message) { if (!condition) throw new Exception(message); }
         var store = new Store(Path.Combine(folder, "data")); var dictionary = new DictionaryService(store);
         Check("Dock geometry / four edges / high DPI",()=>{
@@ -141,6 +146,7 @@ internal static class SelfTest
             using var bmp = Fixture(true); bmp.Save(Path.Combine(folder, "ocr-dark.png"), ImageFormat.Png); var text = capture.Recognize(bmp, CancellationToken.None).GetAwaiter().GetResult(); Assert(text.Contains("Curiosity", StringComparison.OrdinalIgnoreCase) && text.Contains("learning", StringComparison.OrdinalIgnoreCase), "Dark OCR: " + text);
         });
         Check("OpenAI-compatible request / translation / JSON explanation / error", () => ApiCheck(store, Assert).GetAwaiter().GetResult());
+        UpdateTests.Run(Check,folder);
         var output = new { at = DateTimeOffset.Now, passed = results.Count - failed, failed, tests = results };
         File.WriteAllText(Path.Combine(folder, "test-results.json"), JsonSerializer.Serialize(output, Store.Json)); return failed == 0 ? 0 : 1;
     }

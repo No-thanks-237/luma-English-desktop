@@ -1,6 +1,6 @@
 {
-  "at": "2026-10-27T21:49:18.5049191+08:00",
-  "passed": 5,
+  "at": "2026-10-27T22:38:09.8668555+08:00",
+  "passed": 6,
   "failed": 0,
   "tests": [
     {
@@ -12,7 +12,11 @@
       "passed": true
     },
     {
-      "name": "Installed app: dictionary, OCR, crypto and mock API (17 checks)",
+      "name": "Installed app: dictionary, OCR, crypto and mock API (23 checks)",
+      "passed": true
+    },
+    {
+      "name": "Existing compatible VC++ runtime detected; no prerequisite download",
       "passed": true
     },
     {
