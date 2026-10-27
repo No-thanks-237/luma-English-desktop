@@ -1,0 +1,59 @@
+{
+  "date": "2026-10-27",
+  "result": "passed",
+  "version": "0.1.5",
+  "official_installer_upgrade": {
+    "from": "0.1.4",
+    "to": "0.1.5",
+    "packages_match_github_sha256": true,
+    "automatic_relaunch": true,
+    "data": {
+      "allFiveFilesByteIdentical": true,
+      "settingsPreserved": true,
+      "wordsNotesAndDatesPreserved": true,
+      "historyAndCachesPreserved": true,
+      "wordCount": 3,
+      "encryptedTestKeyStillDecrypts": true,
+      "nonDefaultPreferencesLoaded": true
+    }
+  },
+  "application_update": {
+    "client": "isolated diagnostic 0.1.4 build of published 0.1.5 updater",
+    "updater_source_matches_published_tag": true,
+    "updater_source_sha256": "b6172fb20ebaf6a452aba11e6e98b32c5ba65686cb6f8f1b310eef810bbf213a",
+    "initial_download_cache_empty": true,
+    "release_detected_in_ui": "0.1.5",
+    "downloaded_real_github_installer": true,
+    "download_bytes": 96644448,
+    "download_sha256": "00c49e982c66f142dff2e33fc24ad80de39842d20d17ec102f43ddbc9440267c",
+    "download_matches_published_installer": true,
+    "old_process_exited": true,
+    "new_process_automatically_started": true,
+    "installed_dll_matches_official_015": true,
+    "seconds_download_click_to_reopen": 34.7,
+    "close_to_tray_false_preserved": true,
+    "notebook_ui_shows_all_three": true,
+    "data": {
+      "allFiveFilesByteIdentical": true,
+      "settingsPreserved": true,
+      "wordsNotesAndDatesPreserved": true,
+      "historyAndCachesPreserved": true,
+      "wordCount": 3,
+      "encryptedTestKeyStillDecrypts": true,
+      "nonDefaultPreferencesLoaded": true
+    }
+  },
+  "cleanup": {
+    "original_user_profile_restored": true,
+    "original_files_byte_identical": true,
+    "test_installation_removed": true,
+    "normal_015_reopened": true
+  },
+  "scope": [
+    "Official 0.1.4 has no application-update entry; official packages were used for overwrite/relaunch testing.",
+    "Automatic UI chain used an isolated old-version diagnostic client whose updater source is identical to the published 0.1.5 tag.",
+    "The target installer is the unmodified public GitHub v0.1.5 installer.",
+    "VC++ was already installed; clean-machine prerequisite installation was not part of this run."
+  ],
+  "production_code_changes_required": false
+}
