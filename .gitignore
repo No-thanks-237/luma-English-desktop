@@ -1,0 +1,14 @@
+app/
+dist/
+**/bin/
+**/obj/
+.vs/
+*.user
+*.suo
+*.log
+*.tmp
+settings.json
+words.json
+translations.json
+details.json
+etymologies.json

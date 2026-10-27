@@ -1,0 +1,263 @@
+{
+  "at": "2026-10-27T21:47:22.7990569+08:00",
+  "passed": 64,
+  "failed": 0,
+  "tests": [
+    {
+      "name": "title blank area is native caption",
+      "passed": true
+    },
+    {
+      "name": "title brand is native caption",
+      "passed": true
+    },
+    {
+      "name": "title buttons remain client controls",
+      "passed": true
+    },
+    {
+      "name": "maximized title supports native restore drag",
+      "passed": true
+    },
+    {
+      "name": "maximized title buttons remain clickable",
+      "passed": true
+    },
+    {
+      "name": "home-1120 footer bounds",
+      "passed": true
+    },
+    {
+      "name": "home-1120 input height",
+      "passed": true
+    },
+    {
+      "name": "translate-1120 footer bounds",
+      "passed": true
+    },
+    {
+      "name": "translate-1120 input height",
+      "passed": true
+    },
+    {
+      "name": "words-1120 footer bounds",
+      "passed": true
+    },
+    {
+      "name": "words-1120 input height",
+      "passed": true
+    },
+    {
+      "name": "settings-1120 footer bounds",
+      "passed": true
+    },
+    {
+      "name": "settings-1120 input height",
+      "passed": true
+    },
+    {
+      "name": "settings-1120-general",
+      "passed": true
+    },
+    {
+      "name": "settings-1120-general input height",
+      "passed": true
+    },
+    {
+      "name": "settings-1120-api",
+      "passed": true
+    },
+    {
+      "name": "settings-1120-api input height",
+      "passed": true
+    },
+    {
+      "name": "settings-1120-keys",
+      "passed": true
+    },
+    {
+      "name": "settings-1120-keys input height",
+      "passed": true
+    },
+    {
+      "name": "settings-1120-about",
+      "passed": true
+    },
+    {
+      "name": "settings-1120-about input height",
+      "passed": true
+    },
+    {
+      "name": "home-840 footer bounds",
+      "passed": true
+    },
+    {
+      "name": "home-840 input height",
+      "passed": true
+    },
+    {
+      "name": "translate-840 footer bounds",
+      "passed": true
+    },
+    {
+      "name": "translate-840 input height",
+      "passed": true
+    },
+    {
+      "name": "words-840 footer bounds",
+      "passed": true
+    },
+    {
+      "name": "words-840 input height",
+      "passed": true
+    },
+    {
+      "name": "settings-840 footer bounds",
+      "passed": true
+    },
+    {
+      "name": "settings-840 input height",
+      "passed": true
+    },
+    {
+      "name": "settings-840-general",
+      "passed": true
+    },
+    {
+      "name": "settings-840-general input height",
+      "passed": true
+    },
+    {
+      "name": "settings-840-api",
+      "passed": true
+    },
+    {
+      "name": "settings-840-api input height",
+      "passed": true
+    },
+    {
+      "name": "settings-840-keys",
+      "passed": true
+    },
+    {
+      "name": "settings-840-keys input height",
+      "passed": true
+    },
+    {
+      "name": "settings-840-about",
+      "passed": true
+    },
+    {
+      "name": "settings-840-about input height",
+      "passed": true
+    },
+    {
+      "name": "orb window uses per-pixel alpha",
+      "passed": true
+    },
+    {
+      "name": "capsule uses same native window",
+      "passed": true
+    },
+    {
+      "name": "capsule has three commands",
+      "passed": true
+    },
+    {
+      "name": "capsule collapses to orb",
+      "passed": true
+    },
+    {
+      "name": "idle hides docked orb Left",
+      "passed": true
+    },
+    {
+      "name": "edge reveal restores orb Left",
+      "passed": true
+    },
+    {
+      "name": "animated edge collapse keeps host and orb stationary Left",
+      "passed": true
+    },
+    {
+      "name": "collapsed transparent viewport passes pointer through Left",
+      "passed": true
+    },
+    {
+      "name": "idle hides docked orb Right",
+      "passed": true
+    },
+    {
+      "name": "edge reveal restores orb Right",
+      "passed": true
+    },
+    {
+      "name": "animated edge collapse keeps host and orb stationary Right",
+      "passed": true
+    },
+    {
+      "name": "collapsed transparent viewport passes pointer through Right",
+      "passed": true
+    },
+    {
+      "name": "idle hides docked orb Top",
+      "passed": true
+    },
+    {
+      "name": "edge reveal restores orb Top",
+      "passed": true
+    },
+    {
+      "name": "animated edge collapse keeps host and orb stationary Top",
+      "passed": true
+    },
+    {
+      "name": "collapsed transparent viewport passes pointer through Top",
+      "passed": true
+    },
+    {
+      "name": "idle hides docked orb Bottom",
+      "passed": true
+    },
+    {
+      "name": "edge reveal restores orb Bottom",
+      "passed": true
+    },
+    {
+      "name": "animated edge collapse keeps host and orb stationary Bottom",
+      "passed": true
+    },
+    {
+      "name": "collapsed transparent viewport passes pointer through Bottom",
+      "passed": true
+    },
+    {
+      "name": "philosophy-meaning fixed actions",
+      "passed": true
+    },
+    {
+      "name": "philosophy-roots fixed actions",
+      "passed": true
+    },
+    {
+      "name": "philosophy-examples fixed actions",
+      "passed": true
+    },
+    {
+      "name": "pneumonoultramicroscopicsilicovolcanoconiosis-meaning fixed actions",
+      "passed": true
+    },
+    {
+      "name": "pneumonoultramicroscopicsilicovolcanoconiosis-roots fixed actions",
+      "passed": true
+    },
+    {
+      "name": "pneumonoultramicroscopicsilicovolcanoconiosis-examples fixed actions",
+      "passed": true
+    },
+    {
+      "name": "sphere has transparent corners",
+      "passed": true
+    }
+  ]
+}

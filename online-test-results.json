@@ -1,0 +1,19 @@
+{
+  "at": "2026-10-27T19:56:17.9939035+08:00",
+  "passed": 2,
+  "failed": 0,
+  "tests": [
+    {
+      "word": "happiness",
+      "passed": true,
+      "source": "https://en.wiktionary.org/w/index.php?oldid=93698896#English",
+      "characters": 19
+    },
+    {
+      "word": "philosophy",
+      "passed": true,
+      "source": "https://en.wiktionary.org/w/index.php?oldid=93763661#English",
+      "characters": 259
+    }
+  ]
+}

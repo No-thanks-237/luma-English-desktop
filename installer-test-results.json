@@ -1,0 +1,27 @@
+{
+  "at": "2026-10-27T21:49:18.5049191+08:00",
+  "passed": 5,
+  "failed": 0,
+  "tests": [
+    {
+      "name": "Silent current-user installation",
+      "passed": true
+    },
+    {
+      "name": "Installed version and uninstall registration",
+      "passed": true
+    },
+    {
+      "name": "Installed app: dictionary, OCR, crypto and mock API (17 checks)",
+      "passed": true
+    },
+    {
+      "name": "Uninstall removes installed executable and registration",
+      "passed": true
+    },
+    {
+      "name": "Existing Luma user data preserved",
+      "passed": true
+    }
+  ]
+}
